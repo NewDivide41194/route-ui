@@ -1,4 +1,4 @@
-import { baseURL } from "../config/config";
+const baseURL="http://localhost:5000"
 
 const getLocationUrl = "/getLocation";
 const getRouteUrl = "/getRoute";

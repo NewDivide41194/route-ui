@@ -8,7 +8,7 @@ import { addNode } from "./helper/addNode";
 import { addRoute } from "./helper/addRoute";
 import { getRoute } from "./helper/getRoute";
 
-function App() {
+const App = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lng, setLng] = useState(103.70304676245479);
@@ -100,17 +100,18 @@ function App() {
 
     map.current.on("load", () => {
       getRoute(map.current);
-      addRoute(map.current)
-      
+      addRoute(map.current);
     });
   });
 
   return (
-    <div className="App">
-      <div ref={mapContainer} className="map-container"></div>
-    </div>
+    <React.Fragment>
+      <button className="btn-secondary">Reset to Default</button>
+      <button className="btn-primary">Generate Routes</button>
+      <div ref={mapContainer} className="map-container" />
+    </React.Fragment>
   );
-}
+};
 
 export default App;
 
