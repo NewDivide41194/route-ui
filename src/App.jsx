@@ -1,23 +1,44 @@
 import mapboxgl from "mapbox-gl";
 
 import React, { useRef, useEffect, useState } from "react";
-import { fetchLocation } from "./api";
+import { fetchAddCustomLocation, fetchLocation } from "./api";
 import "./App.css";
 import { mapBoxKey } from "./config/config";
 import { addNode } from "./helper/addNode";
-import { addRoute } from "./helper/addRoute";
 import { getRoute } from "./helper/getRoute";
 
 const App = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(103.70304676245479);
-  const [lat, setLat] = useState(1.3507163548200936);
   const [zoom, setZoom] = useState(13);
-  const start = [103.81380771084963, 1.3617195284167138];
+  const center = [103.70304676245479, 1.3507163548200936];
   const [locations, setLocations] = useState(null);
 
   mapboxgl.accessToken = mapBoxKey;
+
+  const customLocation = [];
+
+  const _handleMapClick = (event) => {
+    if (customLocation.length < 5) {
+      const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
+      addNode(map.current, coords);
+      customLocation.push({geometry:coords});
+    } else {
+      alert("Exceed maximum pin!");
+      return;
+    }
+  };
+
+  const _handleGenerate = () => {
+    fetchAddCustomLocation({customLocation}, (err, data) => {
+      if (data) {
+        console.log(data);
+      } else {
+        console.log(err);
+      }
+    });
+  };
+
   useEffect(() => {
     fetchLocation((err, data) => {
       if (data) {
@@ -29,15 +50,13 @@ const App = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: [lng, lat],
+      center: [center[0], center[1]],
       zoom: zoom,
     }).addControl(new mapboxgl.FullscreenControl());
   }, []);
 
   useEffect(() => {
     if (!map.current || !locations) return; // wait for map to initialize
-    // const start=locations.features[0].coordinates
-    const geometryData = locations.features;
 
     for (const feature of locations.features) {
       // create a HTML element for each feature
@@ -51,63 +70,22 @@ const App = () => {
           .addTo(map.current);
       console.log(feature.geometry.coordinates);
     }
-    // map.current.addNode({
-    //         id: "point",
-    //         type: "circle",
-    //         source: {
-    //           type: "geojson",
-    //           data: {
-    //             type: "FeatureCollection",
-    //             features: [
-    //               {
-    //                 type: "Feature",
-    //                 properties: {},
-    //                 geometry: {
-    //                   type: "Point",
-    //                   coordinates: start,
-    //                 },
-    //               },
-    //             ],
-    //           },
-    //         },
-    //         paint: {
-    //           "circle-radius": 10,
-    //           "circle-color": "#3887be",
-    //         },
-    //       });
 
     map.current.on("click", (event) => {
-      const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
-      const end = {
-        type: "FeatureCollection",
-        features: [
-          {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              type: "Point",
-              coordinates: coords,
-            },
-          },
-        ],
-      };
-      if (map.current.getLayer("end")) {
-        map.current.getSource("end").setData(end);
-      } else {
-        addNode(map.current, coords);
-      }
+      _handleMapClick(event);
     });
 
     map.current.on("load", () => {
       getRoute(map.current);
-      addRoute(map.current);
     });
   });
 
   return (
     <React.Fragment>
       <button className="btn-secondary">Reset to Default</button>
-      <button className="btn-primary">Generate Routes</button>
+      <button className="btn-primary" onClick={() => _handleGenerate()}>
+        Generate Routes
+      </button>
       <div ref={mapContainer} className="map-container" />
     </React.Fragment>
   );
