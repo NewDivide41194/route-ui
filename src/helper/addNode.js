@@ -1,5 +1,4 @@
 export const addNode = (map, coords) => {
-  const start = [103.81380771084963, 1.3617195284167138];
   map.addLayer({
     id: "end"+coords,
     type: "circle",

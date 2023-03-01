@@ -1,8 +1,10 @@
-const baseURL = "http://localhost:5000";
-
-const getLocationUrl = "/getLocation";
-const getRouteUrl = "/getRoute";
-const addCustomLocationUrl = "/addCustomLocation";
+import {
+  addCustomLocationUrl,
+  baseURL,
+  deleteCustomLocationUrl,
+  getLocationUrl,
+  getRouteUrl,
+} from "./url";
 
 export const fetchLocation = (callback) => {
   fetch(baseURL + getLocationUrl)
@@ -21,7 +23,20 @@ export const fetchRoute = (callback) => {
 export const fetchAddCustomLocation = (customLocation, callback) => {
   fetch(baseURL + addCustomLocationUrl, {
     method: "POST",
+    headers: {
+      "Content-type": "application/json;charset=UTF-8",
+    },
     body: JSON.stringify(customLocation),
+  })
+    .then((res) => res.json())
+    .then((data) => callback(null, data))
+    .catch((err) => callback(err, null));
+};
+
+export const fetchDeleteCustomLocation = ( callback) => {
+  fetch(baseURL + deleteCustomLocationUrl, {
+    method: "DELETE",
+
   })
     .then((res) => res.json())
     .then((data) => callback(null, data))

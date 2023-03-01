@@ -1,7 +1,11 @@
 import mapboxgl from "mapbox-gl";
 
 import React, { useRef, useEffect, useState } from "react";
-import { fetchAddCustomLocation, fetchLocation } from "./api";
+import {
+  fetchAddCustomLocation,
+  fetchDeleteCustomLocation,
+  fetchLocation,
+} from "./api";
 import "./App.css";
 import { mapBoxKey } from "./config/config";
 import { addNode } from "./helper/addNode";
@@ -13,7 +17,7 @@ const App = () => {
   const [zoom, setZoom] = useState(13);
   const center = [103.70304676245479, 1.3507163548200936];
   const [locations, setLocations] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   mapboxgl.accessToken = mapBoxKey;
 
   const customLocation = [];
@@ -22,29 +26,44 @@ const App = () => {
     if (customLocation.length < 5) {
       const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
       addNode(map.current, coords);
-      customLocation.push({geometry:coords});
+      customLocation.push({
+        geometry: { type: "Point", coordinates: coords },
+        type: "manual",
+      });
     } else {
       alert("Exceed maximum pin!");
       return;
     }
   };
+  const _handleResetClick = () => {
+    fetchDeleteCustomLocation();
+    window.location.reload();
+  };
 
   const _handleGenerate = () => {
-    fetchAddCustomLocation({customLocation}, (err, data) => {
+    setLoading(true);
+    fetchAddCustomLocation({ customLocation }, (err, data) => {
       if (data) {
-        console.log(data);
+        if (data.length === 0) {
+          alert("No Location Found!");
+        }
       } else {
-        console.log(err);
+        alert(err);
       }
+      setLoading(false);
     });
   };
 
   useEffect(() => {
+    setLoading(true);
+
     fetchLocation((err, data) => {
       if (data) {
-        console.log(data);
         setLocations(data);
+      } else {
+        alert(err);
       }
+      setLoading(false);
     });
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
@@ -56,14 +75,15 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (!map.current || !locations) return; // wait for map to initialize
+    if (!map.current || !locations) return;
 
     for (const feature of locations.features) {
-      // create a HTML element for each feature
+      //Add Default Marker
       const el = document.createElement("div");
       el.className = "marker";
       el.innerHTML = "<span><b>" + (feature.id - 1) + "</b></span>";
-      // make a marker for each feature and add to the map
+      //Add Default Marker
+
       if (map.current)
         new mapboxgl.Marker(el)
           .setLngLat(feature.geometry.coordinates)
@@ -82,46 +102,16 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <button className="btn-secondary">Reset to Default</button>
+     {loading&&<div>Loading ...</div>}
+      <div ref={mapContainer} className="map-container" />
+      <button className="btn-secondary" onClick={() => _handleResetClick()}>
+        Reload
+      </button>
       <button className="btn-primary" onClick={() => _handleGenerate()}>
         Generate Routes
       </button>
-      <div ref={mapContainer} className="map-container" />
     </React.Fragment>
   );
 };
 
 export default App;
-
-// map.current.on("move", () => {
-//   setLng(map.current.getCenter().lng.toFixed(4));
-//   setLat(map.current.getCenter().lat.toFixed(4));
-//   setZoom(map.current.getZoom().toFixed(2));
-// });
-
-// Add starting point to the map
-// map.current.addNode({
-//   id: "point",
-//   type: "circle",
-//   source: {
-//     type: "geojson",
-//     data: {
-//       type: "FeatureCollection",
-//       features: [
-//         {
-//           type: "Feature",
-//           properties: {},
-//           geometry: {
-//             type: "Point",
-//             coordinates: start,
-//           },
-//         },
-//       ],
-//     },
-//   },
-//   paint: {
-//     "circle-radius": 10,
-//     "circle-color": "#3887be",
-//   },
-// });
-// this is where the code from the next step will go
