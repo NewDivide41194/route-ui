@@ -1,6 +1,6 @@
 import { fetchRoute } from "../api";
 
-export const getRoute = (map, end) => {
+export const getRoute = async(map) => {
   fetchRoute((err, data) => {
     if (data) {
       if (data.length === 0) {

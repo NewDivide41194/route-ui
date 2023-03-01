@@ -1,29 +1,24 @@
-
-.map-container{
-    height: 80vh;
-    width: 80vw;
-    margin-top: 20px;
+.map-container {
+  height: 80vh;
+  width: 80vw;
+  margin-top: 20px;
 }
 
-.sidebar {
-    background-color: rgba(35, 55, 75, 0.9);
-    color: #fff;
-    padding: 6px 12px;
-    font-family: monospace;
-    z-index: 1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 12px;
-    border-radius: 4px;
-    }
 
-    .marker {
-        /* background-image: url('mapbox-icon.png'); */
-        background-color: rgb(255, 0, 123);
-        background-size: cover;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        cursor: pointer;
-      }
+.marker {
+  background-size: cover;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.loading{
+    display: flex;
+    height: 80vh;
+    width: 80vw;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0,0.5);
+
+}

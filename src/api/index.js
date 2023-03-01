@@ -33,10 +33,9 @@ export const fetchAddCustomLocation = (customLocation, callback) => {
     .catch((err) => callback(err, null));
 };
 
-export const fetchDeleteCustomLocation = ( callback) => {
+export const fetchDeleteCustomLocation =async (callback) => {
   fetch(baseURL + deleteCustomLocationUrl, {
     method: "DELETE",
-
   })
     .then((res) => res.json())
     .then((data) => callback(null, data))

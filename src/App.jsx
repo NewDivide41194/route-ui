@@ -15,7 +15,7 @@ const App = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [zoom, setZoom] = useState(13);
-  const center = [103.70304676245479, 1.3507163548200936];
+  const center = [103.7216117663823,1.3441241804128765];
   const [locations, setLocations] = useState(null);
   const [loading, setLoading] = useState(false);
   mapboxgl.accessToken = mapBoxKey;
@@ -35,18 +35,29 @@ const App = () => {
       return;
     }
   };
-  const _handleResetClick = () => {
-    fetchDeleteCustomLocation();
-    window.location.reload();
+  const _handleResetClick = async () => {
+    setLoading(true);
+    await fetchDeleteCustomLocation((err, data) => {
+      setLoading(false);
+      window.location.reload();
+      if (err) {
+        console.log(err);
+      }
+    });
   };
 
   const _handleGenerate = () => {
+    if (customLocation.length === 0) {
+      alert("No point added!");
+      return;
+    }
     setLoading(true);
     fetchAddCustomLocation({ customLocation }, (err, data) => {
       if (data) {
         if (data.length === 0) {
           alert("No Location Found!");
         }
+        window.location.reload();
       } else {
         alert(err);
       }
@@ -55,15 +66,12 @@ const App = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-
     fetchLocation((err, data) => {
       if (data) {
         setLocations(data);
       } else {
         alert(err);
       }
-      setLoading(false);
     });
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
@@ -82,6 +90,8 @@ const App = () => {
       const el = document.createElement("div");
       el.className = "marker";
       el.innerHTML = "<span><b>" + (feature.id - 1) + "</b></span>";
+      el.style.backgroundColor =
+        feature.type === "default" ? "#eb3498" : "#9e0025";
       //Add Default Marker
 
       if (map.current)
@@ -95,19 +105,32 @@ const App = () => {
       _handleMapClick(event);
     });
 
-    map.current.on("load", () => {
-      getRoute(map.current);
+    map.current.on("load", async () => {
+      await getRoute(map.current);
     });
   });
 
   return (
     <React.Fragment>
-     {loading&&<div>Loading ...</div>}
-      <div ref={mapContainer} className="map-container" />
-      <button className="btn-secondary" onClick={() => _handleResetClick()}>
-        Reload
+      {loading ? (
+        <div className="loading">Loading ...</div>
+      ) : (
+        <div ref={mapContainer} className="map-container" />
+      )}
+      <button
+        className="btn-secondary"
+        disabled={loading}
+        style={{ cursor: loading ? "not-allowed" : "pointer" }}
+        onClick={() => _handleResetClick()}
+      >
+        Reset
       </button>
-      <button className="btn-primary" onClick={() => _handleGenerate()}>
+      <button
+        className="btn-primary"
+        disabled={loading}
+        style={{ cursor: loading ? "not-allowed" : "pointer" }}
+        onClick={() => _handleGenerate()}
+      >
         Generate Routes
       </button>
     </React.Fragment>
