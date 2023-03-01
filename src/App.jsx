@@ -6,7 +6,6 @@ import {
   fetchDeleteCustomLocation,
   fetchLocation,
 } from "./api";
-import "./App.css";
 import { mapBoxKey } from "./config/config";
 import { addNode } from "./helper/addNode";
 import { getRoute } from "./helper/getRoute";
@@ -18,6 +17,7 @@ const App = () => {
   const center = [103.7216117663823,1.3441241804128765];
   const [locations, setLocations] = useState(null);
   const [loading, setLoading] = useState(false);
+
   mapboxgl.accessToken = mapBoxKey;
 
   const customLocation = [];

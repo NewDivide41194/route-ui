@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "test": "jest",
     "build": "vite build",
     "preview": "vite preview"
   },

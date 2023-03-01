@@ -50,3 +50,28 @@ body {
   margin:10px
 
 }
+
+.map-container {
+  height: 80vh;
+  width: 80vw;
+  margin-top: 20px;
+}
+
+
+.marker {
+  background-size: cover;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.loading{
+    display: flex;
+    height: 80vh;
+    width: 80vw;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0,0.5);
+
+}
